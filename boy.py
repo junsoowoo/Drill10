@@ -2,6 +2,10 @@
 
 from pico2d import get_time, load_image, SDL_KEYDOWN, SDL_KEYUP, SDLK_SPACE, SDLK_LEFT, SDLK_RIGHT
 
+import game_world
+from ball import Ball
+
+
 # state event check
 # ( state event type, event value )
 
@@ -45,6 +49,8 @@ class Idle:
 
     @staticmethod
     def exit(boy, e):
+        if space_down(e):
+            boy.fire_ball()
         pass
 
     @staticmethod
@@ -70,6 +76,8 @@ class Run:
 
     @staticmethod
     def exit(boy, e):
+        if space_down(e):
+            boy.fire_ball()
         pass
 
     @staticmethod
@@ -116,7 +124,7 @@ class StateMachine:
         self.transitions = {
             Idle: {right_down: Run, left_down: Run, left_up: Run, right_up: Run, time_out: Sleep, space_down: Idle},
             Run: {right_down: Idle, left_down: Idle, right_up: Idle, left_up: Idle, space_down: Run},
-            Sleep: {right_down: Run, left_down: Run, right_up: Run, left_up: Run, space_down: Idle}
+            Sleep: {right_down: Run, left_down: Run, right_up: Run, left_up: Run}
         }
 
     def start(self):
@@ -144,7 +152,7 @@ class StateMachine:
 
 class Boy:
     def __init__(self):
-        self.x, self.y = 400, 90
+        self.x, self.y = 400, 80
         self.frame = 0
         self.action = 3
         self.dir = 0
@@ -161,3 +169,11 @@ class Boy:
 
     def draw(self):
         self.state_machine.draw()
+
+    def fire_ball(self):
+        ball = Ball(self.x, self.y, self.face_dir * 10)
+        game_world.add_object(ball,1)
+        if self.face_dir == 1:
+            print('fire_ball right')
+        elif self.face_dir == -1:
+            print('fire_ball left')
